@@ -1,0 +1,232 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --text: #9ca3af;
+  --text-h: #ffffff;
+  --bg: #1d1d1d;
+  --border: #333333;
+  --code-bg: #252525;
+  --accent: #1bd3a1;
+  --accent-bg: rgba(27, 211, 161, 0.15);
+  --accent-border: rgba(27, 211, 161, 0.5);
+  --social-bg: rgba(255, 255, 255, 0.1);
+  --shadow: rgba(0, 0, 0, 0.5) 0 10px 15px -3px, rgba(0, 0, 0, 0.3) 0 4px 6px -2px;
+
+  --sans: 'Montserrat', system-ui, -apple-system, sans-serif;
+  --heading: 'Montserrat', system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 16px/1.5 var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  scroll-behavior: smooth;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  margin: 0;
+  text-align: left;
+  border-inline: none;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--heading);
+  color: var(--text-h);
+  margin-top: 0;
+}
+
+.portfolio-app {
+  width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GTA VI CINEMATIC SCROLL SYSTEM
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Base Scroll Reveal ──────────────────────────────── */
+.scroll-reveal {
+  opacity: 0;
+  transition: 
+    opacity var(--reveal-duration, 0.8s) cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0s),
+    transform var(--reveal-duration, 0.8s) cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0s),
+    filter var(--reveal-duration, 0.8s) cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0s);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+}
+
+/* ── Fade Up (default) ───────────────────────────────── */
+.scroll-fade-up {
+  transform: translateY(80px);
+  filter: blur(4px);
+}
+.scroll-fade-up.revealed {
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* ── Fade Down ───────────────────────────────────────── */
+.scroll-fade-down {
+  transform: translateY(-80px);
+  filter: blur(4px);
+}
+.scroll-fade-down.revealed {
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* ── Slide Left ──────────────────────────────────────── */
+.scroll-slide-left {
+  transform: translateX(-120px);
+  filter: blur(4px);
+}
+.scroll-slide-left.revealed {
+  transform: translateX(0);
+  filter: blur(0);
+}
+
+/* ── Slide Right ─────────────────────────────────────── */
+.scroll-slide-right {
+  transform: translateX(120px);
+  filter: blur(4px);
+}
+.scroll-slide-right.revealed {
+  transform: translateX(0);
+  filter: blur(0);
+}
+
+/* ── Scale Up ────────────────────────────────────────── */
+.scroll-scale-up {
+  transform: scale(0.8);
+  filter: blur(6px);
+}
+.scroll-scale-up.revealed {
+  transform: scale(1);
+  filter: blur(0);
+}
+
+/* ── Zoom In (cinematic) ─────────────────────────────── */
+.scroll-zoom-in {
+  transform: scale(1.15);
+  filter: blur(8px);
+}
+.scroll-zoom-in.revealed {
+  transform: scale(1);
+  filter: blur(0);
+}
+
+/* ═══════════════════════════════════════════════════════
+   CINEMATIC TEXT REVEAL (word-by-word)
+   ═══════════════════════════════════════════════════════ */
+.cinematic-text-container {
+  min-height: 30vh;
+  display: flex;
+  align-items: center;
+}
+
+.cinematic-text {
+  font-size: clamp(24px, 3vw, 42px);
+  line-height: 1.6;
+  color: var(--text-h);
+  font-weight: 300;
+  max-width: 900px;
+}
+
+.cinematic-word {
+  display: inline-block;
+  transition: none; /* Handled by JS for smooth scroll-driven effect */
+  will-change: opacity, transform, filter;
+}
+
+/* ═══════════════════════════════════════════════════════
+   STICKY SECTION (GTA VI parallax)
+   ═══════════════════════════════════════════════════════ */
+.sticky-section {
+  position: relative;
+}
+
+.sticky-content {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PARALLAX IMAGE
+   ═══════════════════════════════════════════════════════ */
+.parallax-image-wrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.parallax-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+  transition: none;
+}
+
+/* ═══════════════════════════════════════════════════════
+   COUNT UP
+   ═══════════════════════════════════════════════════════ */
+.count-up {
+  font-family: var(--heading);
+  font-weight: 800;
+  color: var(--accent);
+}
+
+/* ═══════════════════════════════════════════════════════
+   STAGGER CHILDREN
+   ═══════════════════════════════════════════════════════ */
+.stagger-parent.revealed .stagger-child {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.stagger-child {
+  opacity: 0;
+  transform: translateY(40px);
+  filter: blur(3px);
+  transition: 
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger-delay, 0s),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger-delay, 0s),
+    filter 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger-delay, 0s);
+}
+
+/* ═══════════════════════════════════════════════════════
+   SECTION GLOW DIVIDER
+   ═══════════════════════════════════════════════════════ */
+.section-glow-divider {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent) 30%,
+    var(--accent) 70%,
+    transparent 100%
+  );
+  opacity: 0.4;
+  margin: 0 auto;
+}

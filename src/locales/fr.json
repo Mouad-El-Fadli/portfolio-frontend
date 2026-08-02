@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "about": "À propos",
+    "skills": "Compétences",
+    "portfolio": "Projets",
+    "contact": "ME CONTACTER"
+  },
+  "hero": {
+    "greeting": "Bonjour, je suis",
+    "title": "Mouad El fadli",
+    "subtitle": "Développeur Full-Stack & Ingénierie Logicielle",
+    "btn_portfolio": "Voir mes projets",
+    "btn_contact": "Me contacter"
+  },
+  "about": {
+    "title": "C'EST MOI",
+    "description_1": "Passionné par l'ingénierie logicielle, j'ai développé une solide expertise technique à travers la création d'applications concrètes (gestion de parc IT, reconnaissance faciale, tracker mobile).",
+    "description_2": "Maîtrisant les environnements Python, Java et JavaScript, j'aime concevoir des architectures robustes et relever des défis techniques complexes. Ouvert au travail collaboratif, je cherche toujours à innover et à perfectionner mes compétences.",
+    "education_title": "Parcours & Formation",
+    "education_degree": "DUT Génie Informatique - EST Salé (2024-2026)",
+    "education_modules": "Modules étudiés : Architecture SI, Développement Web & Front-End, Programmation Orientée Objet, Python & Machine Learning, Bases de données avancées, IA, Développement JEE et gestion de projet Agile."
+  },
+  "skills": {
+    "title": "COMPÉTENCES"
+  },
+  "portfolio": {
+    "title": "MES PROJETS"
+  },
+  "contact": {
+    "title": "CONTACT",
+    "text": "N'hésitez pas à me contacter pour toute opportunité de collaboration."
+  }
+}

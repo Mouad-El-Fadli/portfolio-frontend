@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "about": "About me",
+    "skills": "Skills",
+    "portfolio": "Projects",
+    "contact": "CONTACT ME"
+  },
+  "hero": {
+    "greeting": "Hi, I am",
+    "title": "Mouad El fadli",
+    "subtitle": "Full-Stack Developer & Software Engineering",
+    "btn_portfolio": "View Projects",
+    "btn_contact": "Contact Me"
+  },
+  "about": {
+    "title": "IT'S ME",
+    "description_1": "Passionate about software engineering, I have developed solid technical expertise through the creation of concrete applications (IT asset management, facial recognition, mobile tracker).",
+    "description_2": "Mastering Python, Java, and JavaScript environments, I enjoy designing robust architectures and taking on complex technical challenges. Open to collaborative work, I am always looking to innovate and improve my skills.",
+    "education_title": "Education & Background",
+    "education_degree": "DUT Computer Engineering - EST Salé (2024-2026)",
+    "education_modules": "Modules studied: IS Architecture, Web & Front-End Development, Object-Oriented Programming, Python & Machine Learning, Advanced Databases, AI, JEE Development, and Agile Project Management."
+  },
+  "skills": {
+    "title": "SKILLS"
+  },
+  "portfolio": {
+    "title": "MY PROJECTS"
+  },
+  "contact": {
+    "title": "CONTACT",
+    "text": "Feel free to reach out for any collaboration opportunities."
+  }
+}

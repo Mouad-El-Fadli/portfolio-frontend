@@ -1,0 +1,240 @@
+.rockstar-footer {
+  background-color: #0b0b0e;
+  padding: 80px 0 40px 0;
+  color: #fff;
+  font-family: var(--sans), sans-serif;
+  text-align: center;
+}
+
+.rockstar-footer-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Contact form styles (top part) */
+.contact-form-wrapper {
+  max-width: 600px;
+  margin: 0 auto 100px;
+}
+.footer-title {
+  font-size: 32px;
+  letter-spacing: 4px;
+  margin-bottom: 32px;
+  border: 2px solid #fff;
+  display: inline-block;
+  padding: 12px 32px;
+  text-transform: uppercase;
+}
+.success-msg {
+  background: var(--accent-bg);
+  color: var(--accent);
+  padding: 12px;
+  border: 1px solid var(--accent);
+  margin-bottom: 24px;
+}
+.contact-form {
+  display: flex;
+  flex-direction: column;
+}
+.contact-form input, .contact-form textarea {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #333;
+  padding: 16px 8px;
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: 2px;
+  outline: none;
+  transition: border-color 0.3s;
+  margin-bottom: 16px;
+}
+.contact-form input:focus, .contact-form textarea:focus {
+  border-bottom-color: #fff;
+}
+.submit-btn {
+  background: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+  padding: 14px 48px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: all 0.3s;
+  align-self: center;
+  margin-top: 16px;
+}
+.submit-btn:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* Rockstar Layout Bottom */
+.rockstar-style-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rockstar-logo-container {
+  margin-bottom: 60px;
+}
+
+.rockstar-profile-photo {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 0 20px rgba(255,255,255,0.2);
+}
+
+.propaganda-box {
+  border: 1px solid #333;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  padding: 12px 32px;
+  max-width: 800px;
+  margin: 0 auto 60px;
+  background: transparent;
+  text-align: left;
+}
+
+.propaganda-left {
+  display: flex;
+  align-items: center;
+  margin-right: 24px;
+  border-right: 1px solid #333;
+  padding-right: 24px;
+}
+
+.propaganda-icon {
+  font-size: 24px;
+  font-weight: 800;
+  margin-right: 12px;
+  letter-spacing: -2px;
+}
+
+.propaganda-title {
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.propaganda-right p {
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.rockstar-socials {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.rockstar-socials a {
+  color: #fff;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.rockstar-socials a:hover {
+  opacity: 1;
+}
+
+.rockstar-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 60px;
+}
+
+.rockstar-links a {
+  color: #888;
+  text-decoration: none;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: color 0.3s;
+}
+
+.rockstar-links a:hover {
+  color: #fff;
+}
+
+.rockstar-rating-container {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  justify-content: center;
+  border-top: 1px solid #222;
+  padding-top: 40px;
+}
+
+.rockstar-rating-box {
+  border: 2px solid #fff;
+  border-radius: 4px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 70px;
+}
+
+.rating-letters {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.rating-desc {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.rockstar-rating-text {
+  text-align: left;
+  font-size: 12px;
+  color: #aaa;
+  line-height: 1.6;
+}
+
+.rockstar-rating-text p {
+  margin: 0;
+}
+
+.rockstar-rating-text strong {
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .propaganda-box {
+    flex-direction: column;
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+  }
+  .propaganda-left {
+    border-right: none;
+    border-bottom: 1px solid #333;
+    margin-right: 0;
+    padding-right: 0;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    justify-content: center;
+  }
+  .rockstar-rating-container {
+    flex-direction: column;
+    text-align: center;
+  }
+  .rockstar-rating-text {
+    text-align: center;
+  }
+}
+
