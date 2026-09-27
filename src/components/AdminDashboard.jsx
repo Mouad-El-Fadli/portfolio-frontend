@@ -11,8 +11,11 @@ const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
   const [education, setEducation] = useState([]);
+  const [experiences, setExperiences] = useState([]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [cvUrl, setCvUrl] = useState(null);
+  const [cvMessage, setCvMessage] = useState('');
 
   // ── Project form state ──
   const [projectForm, setProjectForm] = useState({ title: '', description: '', technologies: '', link: '', image_url: '' });
@@ -25,6 +28,10 @@ const AdminDashboard = () => {
   // ── Education form state ──
   const [eduForm, setEduForm] = useState({ year: '', city: '', degree: '', school: '', mention: '', order_index: 0 });
   const [editingEduId, setEditingEduId] = useState(null);
+
+  // ── Experience form state ──
+  const [expForm, setExpForm] = useState({ title: '', company: '', period: '', location: '', description: '', order_index: 0 });
+  const [editingExpId, setEditingExpId] = useState(null);
 
   // ── Bio form state ──
   const [bioForm, setBioForm] = useState({ text1_fr: '', text2_fr: '' });
@@ -41,6 +48,8 @@ const AdminDashboard = () => {
     fetchEducation();
     fetchBio();
     fetchMessages();
+    fetchExperiences();
+    fetchCv();
   }, []);
 
   const fetchProjects = async () => {
@@ -81,6 +90,95 @@ const AdminDashboard = () => {
     if (!confirm('Supprimer ce message ?')) return;
     await fetch(`${API}/api/contact/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
     fetchMessages();
+  };
+
+  const fetchExperiences = async () => {
+    const res = await fetch(`${API}/api/experiences`);
+    const data = await res.json();
+    setExperiences(data);
+  };
+
+  const fetchCv = async () => {
+    const res = await fetch(`${API}/api/cv`);
+    const data = await res.json();
+    if (data.exists) setCvUrl(data.url);
+  };
+
+  // ── Experience CRUD ──
+  const handleExpSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      let res;
+      if (editingExpId) {
+        res = await fetch(`${API}/api/experiences/${editingExpId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+          body: JSON.stringify(expForm)
+        });
+        if (res.ok) setEditingExpId(null);
+      } else {
+        res = await fetch(`${API}/api/experiences`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+          body: JSON.stringify(expForm)
+        });
+      }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(`Erreur (${res.status}) : ${err.message || 'Opération échouée.'}`);
+      } else {
+        setExpForm({ title: '', company: '', period: '', location: '', description: '', order_index: 0 });
+        await fetchExperiences();
+      }
+    } catch (err) {
+      alert(`Erreur réseau : ${err.message}`);
+    }
+    setLoading(false);
+  };
+
+  const deleteExperience = async (id) => {
+    if (!confirm('Supprimer cette expérience ?')) return;
+    await fetch(`${API}/api/experiences/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
+    fetchExperiences();
+  };
+
+  const editExperience = (exp) => {
+    setExpForm({ title: exp.title, company: exp.company, period: exp.period, location: exp.location || '', description: exp.description || '', order_index: exp.order_index || 0 });
+    setEditingExpId(exp.id);
+    setActiveTab('experience');
+  };
+
+  // ── CV Upload ──
+  const handleCvUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      alert('Seuls les fichiers PDF sont acceptés.');
+      return;
+    }
+    setLoading(true);
+    setCvMessage('Upload en cours...');
+    const formData = new FormData();
+    formData.append('cv', file);
+    try {
+      const res = await fetch(`${API}/api/upload-cv`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${getToken()}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCvUrl(data.url);
+        setCvMessage('✅ CV mis à jour avec succès !');
+      } else {
+        setCvMessage(`❌ Erreur : ${data.error || 'Upload échoué'}`);
+      }
+    } catch (err) {
+      setCvMessage(`❌ Erreur réseau : ${err.message}`);
+    }
+    setLoading(false);
+    setTimeout(() => setCvMessage(''), 4000);
   };
 
   // ── Image Upload (mobile-safe) ──
@@ -335,6 +433,12 @@ const AdminDashboard = () => {
           <li className={activeTab === 'messages' ? 'active' : ''} onClick={() => setActiveTab('messages')}>
             ✉️ Messages
             {messages.length > 0 && <span style={{background: 'var(--accent)', color: '#000', borderRadius: '50%', padding: '2px 8px', fontSize: '12px', marginLeft: '8px'}}>{messages.length}</span>}
+          </li>
+          <li className={activeTab === 'experience' ? 'active' : ''} onClick={() => setActiveTab('experience')}>
+            💼 Expérience
+          </li>
+          <li className={activeTab === 'cv' ? 'active' : ''} onClick={() => setActiveTab('cv')}>
+            📄 Mon CV
           </li>
           <li className={activeTab === 'security' ? 'active' : ''} onClick={() => setActiveTab('security')}>
             🔒 Security
@@ -765,6 +869,131 @@ const AdminDashboard = () => {
                 </button>
               </div>
             </form>
+          </>
+        )}
+
+        {/* ════════ EXPERIENCE TAB ════════ */}
+        {activeTab === 'experience' && (
+          <>
+            <h1>Manage Experience</h1>
+            <form onSubmit={handleExpSubmit} className="admin-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Poste / Titre</label>
+                  <input type="text" placeholder="ex: Développeur Front-End" required
+                    value={expForm.title} onChange={e => setExpForm({...expForm, title: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Entreprise</label>
+                  <input type="text" placeholder="ex: Entreprise XYZ" required
+                    value={expForm.company} onChange={e => setExpForm({...expForm, company: e.target.value})} />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Période</label>
+                  <input type="text" placeholder="ex: Jan 2023 - Déc 2023" required
+                    value={expForm.period} onChange={e => setExpForm({...expForm, period: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Ville / Lieu</label>
+                  <input type="text" placeholder="ex: Casablanca"
+                    value={expForm.location} onChange={e => setExpForm({...expForm, location: e.target.value})} />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Description (missions, tâches…)</label>
+                <textarea rows={4} placeholder="- Développement de composants React&#10;- Intégration API REST..."
+                  value={expForm.description} onChange={e => setExpForm({...expForm, description: e.target.value})}></textarea>
+              </div>
+              <div className="form-group" style={{maxWidth: '150px'}}>
+                <label>Ordre d'affichage</label>
+                <input type="number" min="0"
+                  value={expForm.order_index} onChange={e => setExpForm({...expForm, order_index: parseInt(e.target.value) || 0})} />
+              </div>
+              <div className="form-actions">
+                <button type="submit" className="btn-save" disabled={loading}>
+                  {editingExpId ? '✏ Update Experience' : '+ Add Experience'}
+                </button>
+                {editingExpId && (
+                  <button type="button" className="btn-cancel" onClick={() => { setEditingExpId(null); setExpForm({ title:'', company:'', period:'', location:'', description:'', order_index:0 }); }}>
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </form>
+
+            <div className="data-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Poste</th>
+                    <th>Entreprise</th>
+                    <th>Période</th>
+                    <th>Lieu</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {experiences.length === 0 && (
+                    <tr><td colSpan={5} className="empty-row">Aucune expérience. Ajouter ci-dessus !</td></tr>
+                  )}
+                  {experiences.map(exp => (
+                    <tr key={exp.id}>
+                      <td><strong>{exp.title}</strong></td>
+                      <td>{exp.company}</td>
+                      <td><small>{exp.period}</small></td>
+                      <td><small>{exp.location}</small></td>
+                      <td className="action-cell">
+                        <button className="btn-edit" onClick={() => editExperience(exp)}>✏</button>
+                        <button className="btn-delete" onClick={() => deleteExperience(exp.id)}>🗑</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {/* ════════ CV TAB ════════ */}
+        {activeTab === 'cv' && (
+          <>
+            <h1>📄 Mon CV</h1>
+            <div className="admin-form">
+              <div className="form-group">
+                <label style={{fontSize: '1rem', marginBottom: '12px', display: 'block'}}>
+                  Upload ton CV (PDF) — Il sera téléchargeable par les visiteurs du portfolio
+                </label>
+                <input type="file" accept=".pdf" onChange={handleCvUpload}
+                  style={{padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', width: '100%'}} />
+                {loading && <p style={{color: 'var(--accent)', marginTop: '10px'}}>⏳ Upload en cours...</p>}
+                {cvMessage && (
+                  <p style={{marginTop: '10px', padding: '10px', borderRadius: '8px',
+                    background: cvMessage.startsWith('✅') ? 'rgba(27,211,161,0.1)' : 'rgba(255,85,85,0.1)',
+                    color: cvMessage.startsWith('✅') ? 'var(--accent)' : '#ff5555'}}>
+                    {cvMessage}
+                  </p>
+                )}
+              </div>
+
+              {cvUrl && (
+                <div style={{marginTop: '24px', padding: '20px', background: 'rgba(27,211,161,0.05)', border: '1px solid var(--accent)', borderRadius: '12px'}}>
+                  <p style={{marginBottom: '16px', color: '#aaa'}}>✅ CV actuel disponible :</p>
+                  <div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
+                    <a href={cvUrl} target="_blank" rel="noopener noreferrer"
+                      style={{background: 'var(--accent)', color: '#000', padding: '10px 20px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700'}}>
+                      👁 Voir le CV
+                    </a>
+                    <a href={cvUrl} download="CV_Mouad_El_Fadli.pdf"
+                      style={{background: 'rgba(255,255,255,0.1)', color: '#fff', padding: '10px 20px', borderRadius: '8px', textDecoration: 'none'}}>
+                      ⬇ Télécharger
+                    </a>
+                  </div>
+                  <p style={{marginTop: '12px', fontSize: '12px', color: '#666', wordBreak: 'break-all'}}>{cvUrl}</p>
+                </div>
+              )}
+            </div>
           </>
         )}
 

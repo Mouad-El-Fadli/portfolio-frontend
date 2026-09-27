@@ -10,6 +10,7 @@ import Skills from './components/Skills';
 import Portfolio from './components/Portfolio';
 import Footer from './components/Footer';
 import AdminDashboard from './components/AdminDashboard';
+import Experience from './components/Experience';
 import { useState } from 'react';
 
 const Home = () => {
@@ -18,6 +19,7 @@ const Home = () => {
       <Navbar />
       <Hero />
       <About />
+      <Experience />
       <Skills />
       <Portfolio />
       <Footer />

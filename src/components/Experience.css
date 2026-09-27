@@ -1,0 +1,148 @@
+/* ── Experience Section ──────────────────────────────── */
+.experience-section {
+  padding: 80px 0;
+  background: var(--bg-secondary, #0d1117);
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 50px;
+  color: var(--text-primary, #fff);
+}
+
+.title-accent {
+  margin-right: 10px;
+}
+
+/* ── Timeline ──────────────────────────────────────────── */
+.experience-timeline {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto 50px;
+  padding-left: 30px;
+}
+
+.experience-timeline::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent, #1bd3a1), transparent);
+}
+
+.experience-card {
+  position: relative;
+  margin-bottom: 36px;
+}
+
+.exp-dot {
+  position: absolute;
+  left: -25px;
+  top: 16px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent, #1bd3a1);
+  box-shadow: 0 0 12px var(--accent, #1bd3a1);
+}
+
+.exp-content {
+  background: var(--card-bg, rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 24px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.exp-content:hover {
+  transform: translateX(4px);
+  border-color: var(--accent, #1bd3a1);
+}
+
+.exp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.exp-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent, #1bd3a1);
+  margin: 0 0 6px;
+}
+
+.exp-company {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #aaa);
+  margin: 0;
+}
+
+.exp-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+}
+
+.exp-period,
+.exp-location {
+  font-size: 0.85rem;
+  color: var(--text-muted, #888);
+  background: rgba(255,255,255,0.05);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.exp-description {
+  font-size: 0.92rem;
+  color: var(--text-secondary, #ccc);
+  line-height: 1.7;
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* ── CV Download Button ─────────────────────────────────── */
+.cv-download-wrapper {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.cv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent, #1bd3a1);
+  color: #000;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 14px 32px;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(27, 211, 161, 0.35);
+}
+
+.cv-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(27, 211, 161, 0.5);
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .exp-header {
+    flex-direction: column;
+  }
+  .exp-meta {
+    text-align: left;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
