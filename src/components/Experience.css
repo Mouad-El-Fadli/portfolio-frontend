@@ -1,7 +1,7 @@
 /* ── Experience Section ──────────────────────────────── */
 .experience-section {
   padding: 80px 0;
-  background: var(--bg-secondary, #0d1117);
+  background: var(--bg);
 }
 
 .section-title {
