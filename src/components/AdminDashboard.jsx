@@ -70,7 +70,7 @@ const AdminDashboard = () => {
   };
 
   const fetchMessages = async () => {
-    const res = await fetch(`${API}/api/contact`);
+    const res = await fetch(`${API}/api/contact`, { headers: { 'Authorization': `Bearer ${getToken()}` } });
     if (res.ok) {
       const data = await res.json();
       setMessages(data);
@@ -79,7 +79,7 @@ const AdminDashboard = () => {
 
   const deleteMessage = async (id) => {
     if (!confirm('Supprimer ce message ?')) return;
-    await fetch(`${API}/api/contact/${id}`, { method: 'DELETE' });
+    await fetch(`${API}/api/contact/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
     fetchMessages();
   };
 
@@ -102,6 +102,7 @@ const AdminDashboard = () => {
     try {
       const res = await fetch(`${API}/api/upload`, {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${getToken()}` },
         // Pas de headers Content-Type ici (critique pour mobile)
         body: formData
       });
@@ -122,27 +123,40 @@ const AdminDashboard = () => {
   // ── Projects CRUD ──
   const handleProjectSubmit = async (e) => {
     e.preventDefault();
-    if (editingProjectId) {
-      await fetch(`${API}/api/projects/${editingProjectId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(projectForm)
-      });
-      setEditingProjectId(null);
-    } else {
-      await fetch(`${API}/api/projects`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(projectForm)
-      });
+    setLoading(true);
+    try {
+      let res;
+      if (editingProjectId) {
+        res = await fetch(`${API}/api/projects/${editingProjectId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+          body: JSON.stringify(projectForm)
+        });
+        if (res.ok) setEditingProjectId(null);
+      } else {
+        res = await fetch(`${API}/api/projects`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+          body: JSON.stringify(projectForm)
+        });
+      }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(`Erreur (${res.status}) : ${err.message || 'Opération échouée. Vérifiez votre connexion.'}`);
+      } else {
+        setProjectForm({ title: '', description: '', technologies: '', link: '', image_url: '' });
+        await fetchProjects();
+      }
+    } catch (err) {
+      alert(`Erreur réseau : ${err.message}`);
     }
-    setProjectForm({ title: '', description: '', technologies: '', link: '', image_url: '' });
-    fetchProjects();
+    setLoading(false);
   };
+
 
   const deleteProject = async (id) => {
     if (!confirm('Supprimer ce projet ?')) return;
-    await fetch(`${API}/api/projects/${id}`, { method: 'DELETE' });
+    await fetch(`${API}/api/projects/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
     fetchProjects();
   };
 
@@ -155,27 +169,39 @@ const AdminDashboard = () => {
   // ── Skills CRUD ──
   const handleSkillSubmit = async (e) => {
     e.preventDefault();
-    if (editingSkillId) {
-      await fetch(`${API}/api/skills/${editingSkillId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(skillForm)
-      });
-      setEditingSkillId(null);
-    } else {
-      await fetch(`${API}/api/skills`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(skillForm)
-      });
+    setLoading(true);
+    try {
+      let res;
+      if (editingSkillId) {
+        res = await fetch(`${API}/api/skills/${editingSkillId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+          body: JSON.stringify(skillForm)
+        });
+        if (res.ok) setEditingSkillId(null);
+      } else {
+        res = await fetch(`${API}/api/skills`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+          body: JSON.stringify(skillForm)
+        });
+      }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(`Erreur (${res.status}) : ${err.message || 'Impossible d\'ajouter le skill. Vérifiez votre connexion.'}`);
+      } else {
+        setSkillForm({ name: '', category: 'Frontend', icon: '', color: '#1bd3a1' });
+        await fetchSkills();
+      }
+    } catch (err) {
+      alert(`Erreur réseau : ${err.message}`);
     }
-    setSkillForm({ name: '', category: 'Frontend', icon: '', color: '#1bd3a1' });
-    fetchSkills();
+    setLoading(false);
   };
 
   const deleteSkill = async (id) => {
     if (!confirm('Supprimer cette compétence ?')) return;
-    await fetch(`${API}/api/skills/${id}`, { method: 'DELETE' });
+    await fetch(`${API}/api/skills/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
     fetchSkills();
   };
 
@@ -191,14 +217,14 @@ const AdminDashboard = () => {
     if (editingEduId) {
       await fetch(`${API}/api/education/${editingEduId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
         body: JSON.stringify(eduForm)
       });
       setEditingEduId(null);
     } else {
       await fetch(`${API}/api/education`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
         body: JSON.stringify(eduForm)
       });
     }
@@ -208,7 +234,7 @@ const AdminDashboard = () => {
 
   const deleteEducation = async (id) => {
     if (!confirm('Supprimer cette formation ?')) return;
-    await fetch(`${API}/api/education/${id}`, { method: 'DELETE' });
+    await fetch(`${API}/api/education/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
     fetchEducation();
   };
 
@@ -224,7 +250,7 @@ const AdminDashboard = () => {
     setBioMessage('Traduction en cours et sauvegarde...');
     const res = await fetch(`${API}/api/bio`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify(bioForm)
     });
     if (res.ok) {
@@ -662,7 +688,7 @@ const AdminDashboard = () => {
                   formData.append('image', file);
                   try {
                     // Pas de Content-Type header — laisser le navigateur gérer le boundary
-                    const res = await fetch(`${API}/api/upload-profile`, { method: 'POST', body: formData });
+                    const res = await fetch(`${API}/api/upload-profile`, { method: 'POST', headers: { 'Authorization': `Bearer ${getToken()}` }, body: formData });
                     const data = await res.json();
                     if (res.ok) {
                       alert('Photo de profil mise à jour ! ✅\nLe changement sera visible après le rechargement de la page.');
