@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Experience.css';
+import { ScrollReveal } from './ScrollAnimations';
 
 const API = 'https://mouad12.pythonanywhere.com';
 
@@ -23,40 +24,47 @@ const Experience = () => {
 
   return (
     <section className="experience-section" id="experience">
-      <div className="container">
-        <h2 className="section-title">
-          <span className="title-accent">💼</span> Expérience
-        </h2>
+      <div className="section-container">
+        <ScrollReveal animation="fade-up">
+          <div className="section-header" style={{ textAlign: 'center', width: '100%' }}>
+            <h2 className="section-title">
+              <span className="title-accent">💼</span> Expérience
+            </h2>
+          </div>
+        </ScrollReveal>
 
         {experiences.length > 0 && (
           <div className="experience-timeline">
             {experiences.map((exp, index) => (
-              <div className="experience-card" key={exp.id}>
-                <div className="exp-dot" />
-                <div className="exp-content">
-                  <div className="exp-header">
-                    <div>
-                      <h3 className="exp-title">{exp.title}</h3>
-                      <p className="exp-company">🏢 {exp.company}</p>
+              <ScrollReveal key={exp.id} animation="fade-up" delay={index * 0.1}>
+                <div className="experience-card">
+                  <div className="exp-dot" />
+                  <div className="exp-content">
+                    <div className="exp-header">
+                      <div>
+                        <h3 className="exp-title">{exp.title}</h3>
+                        <p className="exp-company">🏢 {exp.company}</p>
+                      </div>
+                      <div className="exp-meta">
+                        <span className="exp-period">📅 {exp.period}</span>
+                        {exp.location && (
+                          <span className="exp-location">📍 {exp.location}</span>
+                        )}
+                      </div>
                     </div>
-                    <div className="exp-meta">
-                      <span className="exp-period">📅 {exp.period}</span>
-                      {exp.location && (
-                        <span className="exp-location">📍 {exp.location}</span>
-                      )}
-                    </div>
+                    {exp.description && (
+                      <p className="exp-description">{exp.description}</p>
+                    )}
                   </div>
-                  {exp.description && (
-                    <p className="exp-description">{exp.description}</p>
-                  )}
                 </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         )}
 
         {cvUrl && (
-          <div className="cv-download-wrapper">
+          <ScrollReveal animation="fade-up" delay={0.2}>
+            <div className="cv-download-wrapper">
             <a
               href={cvUrl}
               target="_blank"
@@ -67,6 +75,7 @@ const Experience = () => {
               📄 Télécharger mon CV
             </a>
           </div>
+          </ScrollReveal>
         )}
       </div>
     </section>
