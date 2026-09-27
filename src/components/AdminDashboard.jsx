@@ -3,6 +3,9 @@ import './AdminDashboard.css';
 
 const API = 'https://mouad12.pythonanywhere.com';
 
+// Helper : récupère le token stocké lors du login
+const getToken = () => localStorage.getItem('adminToken') || '';
+
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('projects');
   const [projects, setProjects] = useState([]);
@@ -27,9 +30,9 @@ const AdminDashboard = () => {
   const [bioForm, setBioForm] = useState({ text1_fr: '', text2_fr: '' });
   const [bioMessage, setBioMessage] = useState('');
 
-  // ── Password form state ──
-  const [passwordForm, setPasswordForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
-  const [passwordMessage, setPasswordMessage] = useState('');
+  // ── Credentials form state (username + password) ──
+  const [credForm, setCredForm] = useState({ currentPassword: '', newUsername: '', newPassword: '', confirmPassword: '' });
+  const [credMessage, setCredMessage] = useState({ text: '', isError: false });
 
   // ── Load data ──
   useEffect(() => {
@@ -80,23 +83,38 @@ const AdminDashboard = () => {
     fetchMessages();
   };
 
-  // ── Image Upload ──
+  // ── Image Upload (mobile-safe) ──
   const handleImageUpload = async (e, formType) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Validation côté client avant envoi
+    const MAX_SIZE_MB = 16;
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      alert(`Image trop lourde (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum : ${MAX_SIZE_MB} Mo.`);
+      return;
+    }
+
     setLoading(true);
     const formData = new FormData();
+    // NE PAS setter Content-Type manuellement — le navigateur gère le boundary multipart
     formData.append('file', file);
     try {
-      const res = await fetch(`${API}/api/upload`, { method: 'POST', body: formData });
+      const res = await fetch(`${API}/api/upload`, {
+        method: 'POST',
+        // Pas de headers Content-Type ici (critique pour mobile)
+        body: formData
+      });
       const data = await res.json();
-      if (formType === 'project') {
-        setProjectForm({ ...projectForm, image_url: data.url });
+      if (!res.ok) {
+        alert(`Erreur upload : ${data.error || 'Inconnue'}`);
+      } else if (formType === 'project') {
+        setProjectForm(prev => ({ ...prev, image_url: data.url }));
       } else if (formType === 'skill') {
-        setSkillForm({ ...skillForm, icon: data.url });
+        setSkillForm(prev => ({ ...prev, icon: data.url }));
       }
     } catch (err) {
-      alert('Upload failed');
+      alert(`Upload échoué : vérifiez votre connexion (${err.message})`);
     }
     setLoading(false);
   };
@@ -217,28 +235,51 @@ const AdminDashboard = () => {
     }
   };
 
-  // ── Change Password ──
-  const handlePasswordSubmit = async (e) => {
+  // ── Mise à jour des identifiants (username + password) ──
+  const handleCredentialsSubmit = async (e) => {
     e.preventDefault();
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordMessage('Les nouveaux mots de passe ne correspondent pas.');
+    setCredMessage({ text: '', isError: false });
+
+    if (!credForm.newUsername && !credForm.newPassword) {
+      setCredMessage({ text: 'Renseignez au moins un nouveau username ou mot de passe.', isError: true });
       return;
     }
-    
-    const res = await fetch(`${API}/api/change-password`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        oldPassword: passwordForm.oldPassword,
-        newPassword: passwordForm.newPassword
-      })
-    });
-    
-    if (res.ok) {
-      setPasswordMessage('Mot de passe changé avec succès !');
-      setPasswordForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
-    } else {
-      setPasswordMessage('Ancien mot de passe incorrect.');
+    if (credForm.newPassword && credForm.newPassword !== credForm.confirmPassword) {
+      setCredMessage({ text: 'Les nouveaux mots de passe ne correspondent pas.', isError: true });
+      return;
+    }
+    if (credForm.newPassword && credForm.newPassword.length < 8) {
+      setCredMessage({ text: 'Le mot de passe doit contenir au moins 8 caractères.', isError: true });
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/api/update-credentials`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`  // Token envoyé dans le header
+        },
+        body: JSON.stringify({
+          currentPassword: credForm.currentPassword,
+          newUsername: credForm.newUsername,
+          newPassword: credForm.newPassword
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setCredMessage({ text: data.message, isError: false });
+        // Logout automatique : le token a été invalidé côté serveur
+        setTimeout(() => {
+          localStorage.removeItem('adminToken');
+          window.location.href = '/';
+        }, 2000);
+      } else {
+        setCredMessage({ text: data.message || 'Erreur serveur', isError: true });
+      }
+    } catch (err) {
+      setCredMessage({ text: `Erreur réseau : ${err.message}`, isError: true });
     }
   };
 
@@ -609,21 +650,31 @@ const AdminDashboard = () => {
                 <input type="file" accept="image/*" onChange={async (e) => {
                   const file = e.target.files[0];
                   if (!file) return;
+
+                  // Validation côté client
+                  if (file.size > 16 * 1024 * 1024) {
+                    alert(`Image trop lourde (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum : 16 Mo.`);
+                    return;
+                  }
+
                   setLoading(true);
                   const formData = new FormData();
                   formData.append('image', file);
                   try {
+                    // Pas de Content-Type header — laisser le navigateur gérer le boundary
                     const res = await fetch(`${API}/api/upload-profile`, { method: 'POST', body: formData });
                     const data = await res.json();
                     if (res.ok) {
-                      alert('Profile image updated successfully! Timestamp: ' + data.timestamp);
-                      // Update global cache buster so About component can refresh it
-                      window.dispatchEvent(new CustomEvent('profileImageUpdated', { detail: data.timestamp }));
+                      alert('Photo de profil mise à jour ! ✅\nLe changement sera visible après le rechargement de la page.');
+                      // Met à jour l'image de profil dans l'app sans reload
+                      window.dispatchEvent(new CustomEvent('profileImageUpdated', {
+                        detail: { url: data.url, timestamp: data.timestamp }
+                      }));
                     } else {
-                      alert('Error: ' + data.error);
+                      alert(`Erreur : ${data.error || 'Upload échoué'}`);
                     }
                   } catch (err) {
-                    alert('Upload failed');
+                    alert(`Upload échoué : ${err.message}`);
                   }
                   setLoading(false);
                 }} />
@@ -637,32 +688,54 @@ const AdminDashboard = () => {
         {activeTab === 'security' && (
           <>
             <h1>Security Settings</h1>
-            <form onSubmit={handlePasswordSubmit} className="admin-form" style={{maxWidth: '500px'}}>
+            <p style={{color: 'var(--text)', marginBottom: '24px', fontSize: '14px'}}>
+              ⚠️ Après modification, vous serez automatiquement déconnecté et devrez vous reconnecter avec les nouveaux identifiants.
+            </p>
+            <form onSubmit={handleCredentialsSubmit} className="admin-form" style={{maxWidth: '500px'}}>
               <div className="form-group">
-                <label>Current Password</label>
-                <input type="password" required
-                  value={passwordForm.oldPassword} onChange={e => setPasswordForm({...passwordForm, oldPassword: e.target.value})} />
+                <label>Mot de passe actuel <span style={{color:'#ff5555'}}>*</span></label>
+                <input type="password" required placeholder="Votre mot de passe actuel"
+                  value={credForm.currentPassword}
+                  onChange={e => setCredForm({...credForm, currentPassword: e.target.value})} />
+              </div>
+              <hr style={{borderColor: 'rgba(255,255,255,0.1)', margin: '16px 0'}} />
+              <div className="form-group">
+                <label>Nouveau username <span style={{color:'var(--text)', fontSize:'12px'}}>(laisser vide pour ne pas changer)</span></label>
+                <input type="text" placeholder="Nouveau username..."
+                  value={credForm.newUsername}
+                  onChange={e => setCredForm({...credForm, newUsername: e.target.value})}
+                  autoComplete="username" />
               </div>
               <div className="form-group">
-                <label>New Password</label>
-                <input type="password" required
-                  value={passwordForm.newPassword} onChange={e => setPasswordForm({...passwordForm, newPassword: e.target.value})} />
+                <label>Nouveau mot de passe <span style={{color:'var(--text)', fontSize:'12px'}}>(min. 8 caractères, laisser vide pour ne pas changer)</span></label>
+                <input type="password" placeholder="Nouveau mot de passe..."
+                  value={credForm.newPassword}
+                  onChange={e => setCredForm({...credForm, newPassword: e.target.value})}
+                  autoComplete="new-password" />
               </div>
               <div className="form-group">
-                <label>Confirm New Password</label>
-                <input type="password" required
-                  value={passwordForm.confirmPassword} onChange={e => setPasswordForm({...passwordForm, confirmPassword: e.target.value})} />
+                <label>Confirmer le nouveau mot de passe</label>
+                <input type="password" placeholder="Confirmer..."
+                  value={credForm.confirmPassword}
+                  onChange={e => setCredForm({...credForm, confirmPassword: e.target.value})}
+                  autoComplete="new-password" />
               </div>
-              
-              {passwordMessage && (
-                <div style={{marginBottom: '16px', color: passwordMessage.includes('succès') ? 'var(--accent)' : '#ff5555', fontSize: '14px', fontWeight: 'bold'}}>
-                  {passwordMessage}
+
+              {credMessage.text && (
+                <div style={{
+                  marginBottom: '16px',
+                  color: credMessage.isError ? '#ff5555' : 'var(--accent)',
+                  fontSize: '14px', fontWeight: 'bold',
+                  padding: '10px', borderRadius: '8px',
+                  background: credMessage.isError ? 'rgba(255,85,85,0.1)' : 'rgba(27,211,161,0.1)'
+                }}>
+                  {credMessage.isError ? '❌' : '✅'} {credMessage.text}
                 </div>
               )}
-              
+
               <div className="form-actions">
                 <button type="submit" className="btn-save">
-                  Change Password
+                  🔒 Mettre à jour les identifiants
                 </button>
               </div>
             </form>
